@@ -1,54 +1,69 @@
-```markdown
+
 # Static-Site Deployer CLI
 
-**One command → world-wide update.**  
-Give any pre-built front-end bundle (React + Vite, `next export`, Hugo, plain HTML—whatever) a 30-second path to AWS S3 + CloudFront, with no long-lived keys and a Lighthouse quality gate in CI.
+**Ship any static build to S3 + CloudFront in one command, with zero long-lived keys and an automatic Lighthouse gate.**
+
+
+npm run build           # Vite / next export / Hugo / plain HTML
+deploy\_site dist/       # <30 s later → live on CloudFront
+
 
 ---
 
-## ✨ What You Get
+## 🔥 Why you’ll like it
 
-| 🚀 Fast | < 30 s deploy for a 5 MB site |
-|---------|------------------------------|
-| 🔒 Key-free | GitHub OIDC role in CI, AWS SSO locally |
-| 🟢 Quality | Deploy fails if Lighthouse **Perf & A11y < 90** |
-| ↩️ Rollback | Every version kept via S3 object versioning |
+| Feature | What it means |
+|---------|---------------|
+| **< 30 s deploy** | Delta-upload + single CDN invalidation |
+| **Key-free CI** | GitHub OIDC role, no `AWS_ACCESS_KEY_ID` anywhere |
+| **Quality gate** | Pipeline fails if Lighthouse **Perf AND A11y < 90** |
+| **Rollback-ready** | S3 versioning keeps every release |
 
 ---
 
-## 🗺️ 30-Second Tour
+## 🏗️ Folder Layout
 
 ```
 
-npm run build          # or next export / hugo / gatsby build
-deploy\_site dist/      # upload changed files, invalidate CDN
-
-```
-
-**Behind the curtain**
-
-```
-
-┌─ you / CI ─┐                ┌─ S3 bucket (static, versioned) ─┐
-│deploy\_site │── put objects ─▶                               │
-└────────────┘                └─ CloudFront CDN (https) ◀──────┘
-↳  CreateInvalidation  ↲
+static-site-deployer/
+├── cli/                 # Python package
+│   ├── **init**.py
+│   ├── main.py          # click entry-point → deploy\_site
+│   ├── hashutil.py      # SHA-256 helper
+│   ├── uploader.py      # delta S3 sync
+│   └── invalidate.py    # CloudFront invalidation
+├── infra/               # Terraform stack
+│   ├── backend.tf       # remote state config
+│   ├── main.tf          # bucket + CloudFront
+│   ├── oidc.tf          # GitHub OIDC IAM role
+│   └── variables.tf
+├── site-sample/         # tiny demo site (index.html)
+├── .github/workflows/   # CI pipeline
+│   └── deploy.yml
+└── README.md / REQUIREMENTS.md
 
 ````
 
-*Infra is codified in Terraform; CI runs the CLI inside Docker, then audits the live URL with Lighthouse-CI.*
+**What each “shit” does**
+
+| Path | Purpose |
+|------|---------|
+| `cli/` | All Python logic: calculate file hashes, upload changed objects, call CDN invalidation. |
+| `infra/` | Declarative AWS resources: private S3 bucket, CloudFront distro, IAM role for GitHub. |
+| `site-sample/` | Minimal HTML page so you can test a deploy in 30 s. |
+| `.github/workflows/deploy.yml` | Builds, deploys, then runs Lighthouse-CI; blocks if scores < 90. |
 
 ---
 
-## 🛠️  Prerequisites
+## 🛠️ Prerequisites
 
-| Tool | Min Version | Notes |
-|------|-------------|-------|
-| Python | 3.11 | `pyenv` recommended |
-| Terraform | 1.5 | state in S3 w/ Dynamo lock |
-| AWS CLI | v2 | SSO profile set up |
-| Node | 20 | Lighthouse-CI in pipeline |
-| Docker | 20 | Builds pinned action image |
+| Tool | Min version | Why |
+|------|-------------|-----|
+| **Python** | 3.11 | run the CLI |
+| **Terraform** | 1.5 | manage AWS infra |
+| **AWS CLI v2** | — | login via SSO |
+| **Node** | 20 | Lighthouse-CI in pipeline |
+| **Docker** | 20 | pinned CI image |
 
 ---
 
@@ -60,96 +75,85 @@ deploy\_site dist/      # upload changed files, invalidate CDN
    git clone https://github.com/youruser/static-site-deployer
    cd static-site-deployer
    python -m venv .venv && source .venv/bin/activate
-   pip install -e .
+   pip install -e .                 # install CLI
 ````
 
-2. **Deploy the infra (one-time)**
+2. **Provision AWS (one-time)**
 
    ```bash
    cd infra
    terraform init
-   terraform apply      # creates bucket, CDN, OIDC role
+   terraform apply -var="bucket_name=my-static-bucket" \
+                   -var="github_repo=youruser/static-site-deployer"
    ```
 
-3. **Publish your first site**
+   *Outputs show the bucket name, CloudFront distribution ID, and public URL — save them as repo secrets.*
+
+3. **Deploy your first site**
 
    ```bash
    cd ..
-   npm run build        # produces dist/
-   deploy_site dist/    # uses your AWS profile
+   npm run build          # produces dist/
+   export DEPLOY_BUCKET=your-bucket
+   export CF_DIST_ID=E123ABCXYZ
+   deploy_site dist/
    ```
 
-   Output ends with the CloudFront URL—open it and you’re live.
+   Open the printed CloudFront URL — you’re live.
 
 ---
 
-## 🤖  GitHub Actions Pipeline
+## 🤖 CI Pipeline (summary)
 
-`.github/workflows/deploy.yml`
+> Trigger: every push to `main` and every PR.
 
-```
-on: push:
-  branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write   # OIDC
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm ci && npm run build
-      - uses: actions/setup-python@v5
-        with: { python-version: 3.11 }
-      - run: |
-          pip install .
-          deploy_site dist/
-      - uses: treosh/lighthouse-ci-action@v11
-        with:
-          urls: https://${{ env.CF_URL }}
-```
-
-The job fails if Lighthouse Performance or Accessibility drops below 90.
+1. **Build** static site (`npm run build`).
+2. **Deploy** via CLI inside Docker, using OIDC role.
+3. **Audit** new URL with Lighthouse-CI.
+4. **Comment** scores & URL on PR.
+5. **Fail** job if Perf **or** A11y < 90.
 
 ---
 
 ## 🧩 CLI Flags
 
-| Flag        | Default                          | Description                                 |
-| ----------- | -------------------------------- | ------------------------------------------- |
-| `<folder>`  | –                                | built assets (dist/, out/, public/)         |
-| `--bucket`  | env `DEPLOY_BUCKET` or SM secret | target S3 bucket                            |
-| `--dist-id` | env `CF_DIST_ID` or SM secret    | CloudFront distro                           |
-| `--dry-run` | `false`                          | show uploads/invalidation but don’t execute |
+| Flag        | Description                                           | Default source                             |
+| ----------- | ----------------------------------------------------- | ------------------------------------------ |
+| `<folder>`  | Path to built assets (`dist/`, `out/`, etc.)          | —                                          |
+| `--bucket`  | Target S3 bucket name                                 | `DEPLOY_BUCKET` env var or Secrets Manager |
+| `--dist-id` | CloudFront distribution ID                            | `CF_DIST_ID` env var or Secrets Manager    |
+| `--dry-run` | Show would-upload / would-invalidate, make no changes | Off                                        |
+
+Exit codes: **0** ok, **1** arg error, **2** AWS error, **3** Lighthouse gate fail.
 
 ---
 
-## 🏗️  How It Works
+## 🛸 How it works (in plain words)
 
-1. **Delta sync** – file hash vs S3 ETag, upload only changes.
-2. **Batch invalidate** – changed paths grouped (≤ 1000) and sent to CloudFront.
-3. **Least-priv IAM** – role allows `s3:PutObject`, `s3:ListBucket`, `cloudfront:CreateInvalidation` only.
-4. **Zero keys** – GitHub gets a short-lived STS token via OIDC; local dev uses AWS SSO.
+1. **Hash compare** — each local file’s SHA-256 is compared to the S3 object’s ETag; unchanged files are skipped.
+2. **Upload delta** — only new/changed files are PUT, speeding deploys and saving S3 costs.
+3. **Invalidate CDN** — every changed path is sent to CloudFront (max 1 000 per request) so users get fresh files.
+4. **Auth strategy** —
 
----
-
-## 🚀  Stretch Goals
-
-* `deploy_site rollback --version <id>` – revert to any previous S3 object version.
-* Slack webhook on success/failure.
-* Blue/green bucket swap with origin fail-over.
+   * *Local:* AWS SSO or named profile.
+   * *CI:* GitHub OIDC → short-lived IAM role (no stored secrets).
 
 ---
 
-## 📜  Licence
+## 🚀 Stretch ideas
 
-MIT – do whatever, just don’t blame me.
+* `deploy_site rollback --version <id>` — restore a previous S3 object version.
+* Slack or Discord webhook notifications.
+* Blue/green switch with a second bucket + CloudFront origin group.
 
 ---
 
-Happy instant-deploying! Pull requests welcome.
+## 📄 Licence
+
+MIT — Have fun, no warranties.
+
+---
+
+> **Need more depth?** See `REQUIREMENTS.md` for the full spec and `infra/main.tf` for exact AWS resources.
 
 ```
