@@ -18,7 +18,7 @@ Provide a one-command tool (`deploy_site`) that takes a folder of pre-built stat
 | ID  | Requirement                                                                                                           |
 | --- | --------------------------------------------------------------------------------------------------------------------- |
 | F-1 | CLI command format: `deploy_site <folder> [--bucket] [--dist-id] [--dry-run] [--profile]`.                            |
-| F-2 | Calculates a hash for every local file and skips uploads when the remote object’s hash matches.                       |
+| F-2 | Calculates a hash for every local file and skips uploads when the remote object's hash matches.                       |
 | F-3 | Batches all changed paths into one or more CloudFront invalidation requests (maximum 1 000 paths per request).        |
 | F-4 | Displays colour-coded logs and a progress bar while uploading.                                                        |
 | F-5 | Exit codes — **0** success, **1** invalid arguments, **2** AWS operation failed, **3** Lighthouse gate failed.        |
@@ -92,7 +92,31 @@ Provide a one-command tool (`deploy_site`) that takes a folder of pre-built stat
 
 ---
 
-#### 9. Roles & Responsibilities
+#### 9. Windows-Specific Requirements
+
+| Requirement | Description |
+|-------------|-------------|
+| **PowerShell Execution Policy** | Must support `RemoteSigned` or `Unrestricted` execution policy for script execution. |
+| **Path Handling** | CLI must handle both forward slashes (`/`) and backslashes (`\`) in file paths correctly. |
+| **Environment Variables** | Must support PowerShell environment variable syntax (`$env:VARIABLE_NAME`). |
+| **Virtual Environment** | Must work with Python virtual environments created via `python -m venv`. |
+| **Package Management** | Should support installation via Chocolatey, Winget, or direct download. |
+| **Line Endings** | Must handle Windows line endings (CRLF) in configuration files. |
+| **File Permissions** | Must respect Windows file system permissions and security contexts. |
+
+---
+
+#### 10. Cross-Platform Compatibility
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| **Windows** | Primary | PowerShell, Chocolatey/Winget package management |
+| **macOS** | Secondary | Homebrew package management, bash/zsh shells |
+| **Linux** | Secondary | apt/yum package management, bash shells |
+
+---
+
+#### 11. Roles & Responsibilities
 
 * **Developer** — builds static site, runs CLI locally, reviews pipeline results.
 * **CI Pipeline** — automates deploy and quality checks on every commit.

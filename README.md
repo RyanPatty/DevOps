@@ -1,16 +1,15 @@
-
 # Static-Site Deployer CLI
 
 **Ship any static build to S3 + CloudFront in one command, with zero long-lived keys and an automatic Lighthouse gate.**
 
 
 npm run build           # Vite / next export / Hugo / plain HTML
-deploy\_site dist/       # <30 s later → live on CloudFront
+deploy_site dist/       # <30 s later → live on CloudFront
 
 
 ---
 
-## 🔥 Why you’ll like it
+## 🔥 Why you'll like it
 
 | Feature | What it means |
 |---------|---------------|
@@ -24,11 +23,10 @@ deploy\_site dist/       # <30 s later → live on CloudFront
 ## 🏗️ Folder Layout
 
 ```
-
 static-site-deployer/
 ├── cli/                 # Python package
 │   ├── **init**.py
-│   ├── main.py          # click entry-point → deploy\_site
+│   ├── main.py          # click entry-point → deploy_site
 │   ├── hashutil.py      # SHA-256 helper
 │   ├── uploader.py      # delta S3 sync
 │   └── invalidate.py    # CloudFront invalidation
@@ -41,10 +39,9 @@ static-site-deployer/
 ├── .github/workflows/   # CI pipeline
 │   └── deploy.yml
 └── README.md / REQUIREMENTS.md
+```
 
-````
-
-**What each “shit” does**
+**What each "shit" does**
 
 | Path | Purpose |
 |------|---------|
@@ -71,19 +68,20 @@ static-site-deployer/
 
 1. **Clone & bootstrap**
 
-   ```bash
+   ```powershell
    git clone https://github.com/youruser/static-site-deployer
    cd static-site-deployer
-   python -m venv .venv && source .venv/bin/activate
+   python -m venv .venv
+   .venv\Scripts\Activate.ps1
    pip install -e .                 # install CLI
-````
+   ```
 
 2. **Provision AWS (one-time)**
 
-   ```bash
+   ```powershell
    cd infra
    terraform init
-   terraform apply -var="bucket_name=my-static-bucket" \
+   terraform apply -var="bucket_name=my-static-bucket" `
                    -var="github_repo=youruser/static-site-deployer"
    ```
 
@@ -91,15 +89,15 @@ static-site-deployer/
 
 3. **Deploy your first site**
 
-   ```bash
+   ```powershell
    cd ..
    npm run build          # produces dist/
-   export DEPLOY_BUCKET=your-bucket
-   export CF_DIST_ID=E123ABCXYZ
+   $env:DEPLOY_BUCKET="your-bucket"
+   $env:CF_DIST_ID="E123ABCXYZ"
    deploy_site dist/
    ```
 
-   Open the printed CloudFront URL — you’re live.
+   Open the printed CloudFront URL — you're live.
 
 ---
 
@@ -130,7 +128,7 @@ Exit codes: **0** ok, **1** arg error, **2** AWS error, **3** Lighthouse gate fa
 
 ## 🛸 How it works (in plain words)
 
-1. **Hash compare** — each local file’s SHA-256 is compared to the S3 object’s ETag; unchanged files are skipped.
+1. **Hash compare** — each local file's SHA-256 is compared to the S3 object's ETag; unchanged files are skipped.
 2. **Upload delta** — only new/changed files are PUT, speeding deploys and saving S3 costs.
 3. **Invalidate CDN** — every changed path is sent to CloudFront (max 1 000 per request) so users get fresh files.
 4. **Auth strategy** —
@@ -156,4 +154,60 @@ MIT — Have fun, no warranties.
 
 > **Need more depth?** See `REQUIREMENTS.md` for the full spec and `infra/main.tf` for exact AWS resources.
 
+---
+
+## 🪟 Windows-Specific Setup
+
+### Package Installation
+
+**Option 1: Chocolatey (Recommended)**
+```powershell
+# Install Chocolatey first (run as Administrator)
+Set-ExecutionPolicy Bypass -Scope Process -Force
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Install required tools
+choco install python terraform awscli jq git nodejs -y
+```
+
+**Option 2: Winget**
+```powershell
+winget install Python.Python.3.11
+winget install HashiCorp.Terraform
+winget install Amazon.AWSCLI
+winget install Git.Git
+winget install OpenJS.NodeJS
+```
+
+### PowerShell Execution Policy
+
+If you encounter execution policy issues:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### Environment Variables
+
+For persistent environment variables across sessions, add to your PowerShell profile:
+```powershell
+# Edit profile
+notepad $PROFILE
+
+# Add these lines
+$env:DEPLOY_BUCKET="your-bucket-name"
+$env:CF_DIST_ID="your-distribution-id"
+$env:CF_URL="https://your-cloudfront-url.net"
+```
+
+### Virtual Environment
+
+Always activate your virtual environment before working:
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+To deactivate:
+```powershell
+deactivate
 ```

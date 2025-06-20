@@ -1,15 +1,16 @@
-# “Static-Site Deployer CLI” – Step-By-Step Build Plan
+# "Static-Site Deployer CLI" – Step-By-Step Build Plan (Windows Edition)
 
-*Use each numbered step in order; read the little side notes (➜) to understand **why** you’re doing it.*
+*Use each numbered step in order; read the little side notes (➜) to understand **why** you're doing it.*
 
 ---
 
-## 0  Prep your workstation (10 min)
+## 0  Prep your workstation (15 min)
 
 | Action             | Command / Note                                            |
 | ------------------ | --------------------------------------------------------- |
-| Install core tools | `brew install pyenv nvm terraform awscli jq tree`         |
-| Create project dir | `mkdir static-site-deployer && cd $_ && git init -b main` |
+| Install Chocolatey | Run PowerShell as Administrator: `Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))` |
+| Install core tools | `choco install python terraform awscli jq git nodejs -y`   |
+| Create project dir | `mkdir static-site-deployer; cd static-site-deployer; git init -b main` |
 
 > ➜ **Why:** clean workspace keeps dependencies isolated and makes it easy to wipe/re-clone.
 
@@ -19,7 +20,8 @@
 
 | Action             | Command                                                                             |
 | ------------------ | ----------------------------------------------------------------------------------- |
-| Install & activate | `pyenv install 3.11.7 && pyenv virtualenv 3.11.7 ssd-env && pyenv activate ssd-env` |
+| Create virtualenv  | `python -m venv .venv`                                                              |
+| Activate           | `.venv\Scripts\Activate.ps1`                                                        |
 | Confirm            | `python -V`  → shows `3.11.x`                                                       |
 
 > ➜ A dedicated virtualenv prevents package conflicts with other projects.
@@ -28,11 +30,13 @@
 
 ## 2  Basic repo scaffold (5 min)
 
-```bash
-mkdir -p cli infra .github/workflows site-sample
-touch cli/__init__.py README.md REQUIREMENTS.md
-echo "<h1>Hello world</h1>" > site-sample/index.html
-git add . && git commit -m "chore: scaffold repo"
+```powershell
+mkdir cli, infra, .github\workflows, site-sample
+New-Item cli\__init__.py -ItemType File
+New-Item README.md -ItemType File
+New-Item REQUIREMENTS.md -ItemType File
+"<h1>Hello world</h1>" | Out-File -FilePath site-sample\index.html -Encoding UTF8
+git add . ; git commit -m "chore: scaffold repo"
 ```
 
 > ➜ You now have three clear zones: *cli*, *infra*, and *CI*.
@@ -45,16 +49,16 @@ git add . && git commit -m "chore: scaffold repo"
    `aws configure sso --profile dev`
 2. **Create backend bucket & lock table** *(only once per AWS account)*
 
-   ```bash
+   ```powershell
    aws s3 mb s3://YOUR-TF-STATE-BUCKET
-   aws dynamodb create-table \
-     --table-name tf-state-lock \
-     --attribute-definitions AttributeName=LockID,AttributeType=S \
-     --key-schema AttributeName=LockID,KeyType=HASH \
+   aws dynamodb create-table `
+     --table-name tf-state-lock `
+     --attribute-definitions AttributeName=LockID,AttributeType=S `
+     --key-schema AttributeName=LockID,KeyType=HASH `
      --billing-mode PAY_PER_REQUEST
    ```
 
-> ➜ Terraform remote state avoids “state file in Git” headaches; the lock table stops simultaneous applies.
+> ➜ Terraform remote state avoids "state file in Git" headaches; the lock table stops simultaneous applies.
 
 ---
 
@@ -83,7 +87,7 @@ Commit with message `infra: add remote backend`.
 
 Add a new file `infra/oidc.tf` that:
 
-* trusts GitHub’s OIDC provider
+* trusts GitHub's OIDC provider
 * limits `sts:AssumeRoleWithWebIdentity` to `repo:YOURUSER/static-site-deployer:ref:refs/heads/main`
 * grants **only** `s3:PutObject/ListBucket` and `cloudfront:CreateInvalidation`.
 
@@ -95,12 +99,12 @@ Re-`terraform apply`. Copy the role ARN for later.
 
 ## 7  Local Secrets (1 min)
 
-Save the three Terraform outputs to your shell for easy testing:
+Save the three Terraform outputs to your PowerShell session for easy testing:
 
-```bash
-export DEPLOY_BUCKET=YOUR-BUCKET
-export CF_DIST_ID=YOUR-DIST-ID
-export CF_URL=https://XXXX.cloudfront.net
+```powershell
+$env:DEPLOY_BUCKET="YOUR-BUCKET"
+$env:CF_DIST_ID="YOUR-DIST-ID"
+$env:CF_URL="https://XXXX.cloudfront.net"
 ```
 
 ---
@@ -137,7 +141,7 @@ Function in `cli/invalidate.py`:
 * Accept list of changed keys → prepend `/` → chunk into batches ≤ 1000.
 * Call `create_invalidation` once per batch.
 
-> ➜ CDN won’t cache bust unless you send invalidation; batching saves API quota.
+> ➜ CDN won't cache bust unless you send invalidation; batching saves API quota.
 
 ---
 
@@ -154,8 +158,8 @@ Add console script in `pyproject.toml`:
 
 Test locally:
 
-```bash
-deploy_site site-sample/ --bucket $DEPLOY_BUCKET --dist-id $CF_DIST_ID
+```powershell
+deploy_site site-sample/ --bucket $env:DEPLOY_BUCKET --dist-id $env:CF_DIST_ID
 ```
 
 Check CloudFront URL updates.
@@ -164,8 +168,9 @@ Check CloudFront URL updates.
 
 ## 12  Lighthouse manual sanity (5 min)
 
-```bash
-npx lhci collect --url=$CF_URL && npx lhci upload --target=temporary-public-storage
+```powershell
+npx lhci collect --url=$env:CF_URL
+npx lhci upload --target=temporary-public-storage
 ```
 
 Note scores—need ≥ 90 Perf & A11y to pass CI later.
@@ -201,8 +206,8 @@ Commit: `ci: add deploy workflow`.
 
 ## 15  Push + watch (5 min)
 
-```bash
-git add . && git commit -m "feat: MVP deploy CLI" && git push -u origin main
+```powershell
+git add . ; git commit -m "feat: MVP deploy CLI" ; git push -u origin main
 ```
 
 Open **Actions** tab → confirm pipeline:
@@ -218,7 +223,7 @@ Open **Actions** tab → confirm pipeline:
 
 * Run `deploy_site site-sample/ --dry-run` → expect **no** S3/CF calls.
 * Temporarily break bucket env var → expect exit 1.
-* Throttle network with `tc` or just kill Wi-Fi → expect exit 2 after retries.
+* Throttle network or just kill Wi-Fi → expect exit 2 after retries.
 
 > ➜ Confirms error handling and exit codes match spec.
 
@@ -228,7 +233,7 @@ Open **Actions** tab → confirm pipeline:
 
 Add `ruff` and `black` pre-commit hook:
 
-```bash
+```powershell
 pip install ruff black pre-commit
 pre-commit install
 ```
@@ -266,7 +271,7 @@ Tick every line in the **Requirements Acceptance** section:
 
 ## 21  Tag v1.0 (2 min)
 
-```bash
+```powershell
 git tag v1.0.0 -m "First stable release"
 git push --tags
 ```
@@ -275,6 +280,34 @@ git push --tags
 
 ---
 
-### You’re done!
+### You're done!
 
 You have a fully automated, key-less, quality-guarded static site deploy pipeline — built incrementally with clear understanding at every step.
+
+---
+
+## Windows-Specific Notes
+
+### PowerShell Execution Policy
+If you encounter execution policy issues:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### Path Separators
+- Use backslashes (`\`) for Windows paths in PowerShell
+- Use forward slashes (`/`) in Git and cross-platform tools
+
+### Environment Variables
+- PowerShell: `$env:VARIABLE_NAME="value"`
+- CMD: `set VARIABLE_NAME=value`
+- For persistence across sessions, add to your PowerShell profile
+
+### Virtual Environment Activation
+- PowerShell: `.venv\Scripts\Activate.ps1`
+- CMD: `.venv\Scripts\activate.bat`
+
+### Package Management
+- Chocolatey: `choco install package-name`
+- Winget: `winget install package-name`
+- Python: `pip install package-name`
