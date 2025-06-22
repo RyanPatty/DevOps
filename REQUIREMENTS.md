@@ -123,5 +123,3 @@ Provide a one-command tool (`deploy_site`) that takes a folder of pre-built stat
 * **AWS Account Owner** — approves IAM policies and pays the bill.
 
 ---
-
-**End of Detailed Requirements**
