@@ -11,7 +11,7 @@
   - Node.js v20.10.0 ✅
   - Git 2.42.0 ✅
   - Terraform v1.12.2 ✅ (just installed)
-  - jq ❌ (needs installation)
+  - jq ✅ (installed via Chocolatey)
 - ✅ **Project Setup**: Created `static-site-deployer` directory
 - ✅ **Git Init**: Git repository already initialized with main branch
 
@@ -45,31 +45,83 @@
 - ✅ **Environment Setup**: Imported Chocolatey profile module for PATH updates
 - ✅ **Version Test**: Confirmed Terraform is working correctly
 
-### Step 5 - Terraform initialization (RESOLVED)
-- ✅ **Account Mismatch Issue**: Identified and resolved account mismatch (bucket created in 471112835616, IAM user in 296950653587)
-- ✅ **Bucket Recreation**: Deleted old bucket and recreated in correct account (296950653587)
-- ✅ **State File Issues**: Resolved corrupted state file and backend configuration conflicts
-- ✅ **Local Initialization**: Successfully initialized Terraform with local state and AWS provider v5.100.0
-- ✅ **Provider Installation**: AWS provider installed and lock file created
-- 🔄 **Next**: Create S3 bucket & CloudFront distribution with Terraform
+### Step 5 - Create S3 bucket & CloudFront (COMPLETED)
+- ✅ **Terraform Infrastructure**: Created `infra/main.tf` with S3 bucket and CloudFront distribution
+- ✅ **Terraform Plan**: Successfully planned infrastructure with 6 resources
+- ✅ **Terraform Apply**: Successfully created all AWS resources
+- ✅ **S3 Bucket**: `ryan-static-site-deployer` created with versioning and website hosting
+- ✅ **CloudFront Distribution**: `E2U98SO9UWJ7JS` created with Origin Access Control
+- ✅ **CloudFront URL**: `https://d2ckbhbg0ietbn.cloudfront.net`
+- ✅ **S3 Website URL**: `ryan-static-site-deployer.s3-website-us-east-1.amazonaws.com`
+- ✅ **S3 Bucket Policy**: Added policy to allow CloudFront access via Origin Access Control
+- ✅ **CloudFront Access Fix**: Resolved "Access Denied" error by adding missing bucket policy
+
+### Step 6 - IAM OIDC role (GitHub) (PENDING)
+- 🔄 **Next**: Create `infra/oidc.tf` for GitHub Actions OIDC role
+
+### Step 7 - Local Secrets (COMPLETED)
+- ✅ **Environment Variables**: Set up PowerShell environment variables
+- ✅ **DEPLOY_BUCKET**: `ryan-static-site-deployer`
+- ✅ **CF_DIST_ID**: `E2U98SO9UWJ7JS`
+- ✅ **CF_URL**: `https://d2ckbhbg0ietbn.cloudfront.net`
+
+### Step 8 - Python package skeleton (COMPLETED)
+- ✅ **pyproject.toml**: Created with all required dependencies (boto3, click, tqdm, colorama)
+- ✅ **Package Installation**: Successfully installed with `pip install -e .`
+- ✅ **Console Script**: `deploy_site = "cli.main:cli"` configured
+
+### Step 9 - CLI hash & upload logic (COMPLETED)
+- ✅ **cli/hashutil.py**: Created file hash comparison utilities
+- ✅ **cli/uploader.py**: Created S3 upload logic with delta detection
+- ✅ **Hash Comparison**: MD5 hash comparison with S3 ETags
+- ✅ **Progress Bar**: TQDM integration for file processing
+- ✅ **Colored Output**: Colorama integration for cross-platform colors
+
+### Step 10 - CloudFront invalidation logic (COMPLETED)
+- ✅ **cli/invalidate.py**: Created CloudFront invalidation logic
+- ✅ **Path Normalization**: Automatic `/` prefix for CloudFront paths
+- ✅ **Batch Processing**: Handles >1000 paths with multiple invalidations
+- ✅ **Invalidation Tracking**: Wait for invalidation completion
+
+### Step 11 - Entry-point script (COMPLETED)
+- ✅ **cli/main.py**: Created main CLI entry point with Click framework
+- ✅ **CLI Flags**: Implemented all required flags (--bucket, --dist-id, --dry-run, --wait)
+- ✅ **Environment Variables**: Support for DEPLOY_BUCKET and CF_DIST_ID env vars
+- ✅ **Exit Codes**: Proper exit codes (0=success, 1=arg error, 2=AWS error)
+- ✅ **Dry Run Mode**: Full dry-run implementation
+- ✅ **Error Handling**: Comprehensive error handling and user feedback
 
 ## 🔄 Current Status
-- **Current Step**: Step 5 (Create S3 bucket & CloudFront with Terraform)
-- **Working Directory**: `C:\Users\Ryan\Desktop\Work\BriteSystems\DevOps\static-site-deployer\infra`
-- **Virtual Environment**: Needs recreation (`.venv` was deleted to avoid Git issues)
+- **Current Step**: Step 12 (Lighthouse manual sanity check)
+- **Working Directory**: `C:\Users\Ryan\Desktop\Work\BriteSystems\DevOps\static-site-deployer`
+- **Virtual Environment**: ✅ Active and working
 - **AWS Profile**: `ryan_dev_home` configured and tested
-- **Terraform**: v1.12.2 installed, needs reinitialization
-- **Backend**: Temporarily using local state (backend.tf renamed to backend.tf.temp)
-- **Gitignore**: ✅ Properly configured to prevent future virtual environment commits
+- **Terraform**: ✅ Infrastructure created successfully
+- **Python CLI**: ✅ Fully functional with all components
+- **jq**: ✅ Installed and available
+- **Documentation**: ✅ Updated README and created howTo.md
 
-## 📋 Next Steps
-1. Recreate Python virtual environment: `python -m venv .venv`
-2. Activate virtual environment: `.venv\Scripts\Activate.ps1`
-3. Reinitialize Terraform: `terraform init`
-4. Create S3 bucket and CloudFront distribution with `terraform plan` and `terraform apply`
-5. Restore remote backend configuration once infrastructure is created
-6. Install jq (last missing tool)
-7. Begin Python CLI development
+## 📋 Next Steps (According to Plan)
+1. **Step 12**: Lighthouse manual sanity check (in progress)
+2. **Step 6**: Create IAM OIDC role for GitHub Actions (`infra/oidc.tf`)
+3. **Step 13**: GitHub Secrets/Vars setup
+4. **Step 14**: GitHub Actions workflow
+5. **Step 15**: Push and test pipeline
+
+## 🚀 CLI Testing Status
+- ✅ **deploy_site --help**: Working
+- ✅ **deploy_site site-sample --dry-run**: Working with AWS profile
+- ✅ **deploy_site site-sample**: Working with actual deployment
+- ✅ **Actual deployment**: Successfully deployed to CloudFront
+- ✅ **CloudFront invalidation**: Working (ID: I3RQYWATE9JM8FE1ZCJVKF0TG3)
+- ✅ **Hash comparison**: Working (skips unchanged files)
+- ✅ **Error handling**: Working (403 errors handled properly with profile)
+
+## 📚 Documentation Status
+- ✅ **README.md**: Updated with current progress and accurate information
+- ✅ **howTo.md**: Created comprehensive build and usage guide
+- ✅ **thingsWeDid.md**: Updated with current progress
+- ✅ **PLAN.md**: Updated with .gitignore notes
 
 ## 🛠️ Windows-Specific Adaptations Made
 - Using PowerShell instead of bash

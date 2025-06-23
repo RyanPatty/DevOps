@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "static-site-deployer"
+version = "0.1.0"
+description = "Deploy static sites to S3 + CloudFront with zero long-lived keys"
+authors = [{name = "Ryan Patty", email = "ryan@example.com"}]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.34.0",
+    "click>=8.1.0",
+    "tqdm>=4.66.0",
+    "colorama>=0.4.6",
+]
+
+[project.scripts]
+deploy_site = "cli.main:cli"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cli*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 88
+target-version = "py311" 
