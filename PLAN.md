@@ -41,6 +41,13 @@ git add . ; git commit -m "chore: scaffold repo"
 
 > ➜ You now have three clear zones: *cli*, *infra*, and *CI*.
 
+**IMPORTANT:** Create `.gitignore` before committing to prevent virtual environment files from being tracked:
+```powershell
+# Add .gitignore with Python, Terraform, and IDE exclusions
+# Include .venv/, __pycache__/, .terraform/, etc.
+# This prevents accidentally committing sensitive or generated files
+```
+
 ---
 
 ## 3  AWS account bootstrap (15 min **one-time**)

@@ -1,5 +1,5 @@
 # Static-Site Deployer CLI
-
+C:\Users\Ryan\Desktop\Work\BriteSystems\DevOps\static-site-deployer\infra>
 **Ship any static build to S3 + CloudFront in one command, with zero long-lived keys and an automatic Lighthouse gate.**
 
 
@@ -41,7 +41,7 @@ static-site-deployer/
 └── README.md / REQUIREMENTS.md
 ```
 
-**What each "shit" does**
+**What each thing does**
 
 | Path | Purpose |
 |------|---------|
@@ -135,6 +135,38 @@ Exit codes: **0** ok, **1** arg error, **2** AWS error, **3** Lighthouse gate fa
 
    * *Local:* AWS SSO or named profile.
    * *CI:* GitHub OIDC → short-lived IAM role (no stored secrets).
+
+---
+
+## 🏗️ Infrastructure Architecture
+
+### Terraform Remote State
+
+**The Problem:**
+- Terraform needs to remember what resources it created (S3 buckets, CloudFront, etc.)
+- By default, Terraform stores this info in a local file called `terraform.tfstate`
+- If you put this file in Git, you're storing sensitive info (resource IDs, etc.) in your repo
+- If multiple people work on the project, they could overwrite each other's changes
+
+**The Solution:**
+- Store the state file in S3 (remote storage) instead of locally
+- Use DynamoDB to "lock" the state so only one person can run Terraform at a time
+- This way:
+  - ✅ No sensitive files in Git
+  - ✅ Team can collaborate safely
+  - ✅ State is backed up in AWS
+  - ✅ You can see what resources exist even if you delete your local files
+
+**What we're building:**
+```
+Your Local Files → Terraform → AWS Resources
+     ↓
+Terraform State (stored in S3)
+     ↓
+Lock Table (DynamoDB prevents conflicts)
+```
+
+**So the S3 bucket is like a "memory bank" for Terraform to remember what it built.**
 
 ---
 
