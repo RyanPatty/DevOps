@@ -24,6 +24,10 @@ dev = [
     "pytest>=7.4.0",
     "black>=23.0.0",
     "ruff>=0.1.0",
+    "pre-commit>=3.5.0",
+    "mypy>=1.8.0",
+    "types-requests",
+    "types-boto3",
 ]
 
 [tool.setuptools.packages.find]
@@ -36,4 +40,12 @@ target-version = ['py311']
 
 [tool.ruff]
 line-length = 88
-target-version = "py311" 
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "DTZ", "T10", "EM", "EXE", "FA", "ICN", "INP", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "AIR", "PERF", "FURB", "LOG", "RUF"]
+ignore = ["E501", "W503", "F401"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true 
