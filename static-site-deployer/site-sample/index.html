@@ -3,9 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Site</title>
+    <title>Static Site Deployer Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .timestamp {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello world - UPDATED!</h1>
+    <div class="header">
+        <h1>🚀 Static Site Deployer CLI</h1>
+        <p>Successfully deployed via intelligent delta uploads!</p>
+    </div>
+
+    <div class="timestamp">
+        <strong>Last Deployed:</strong> 2025-06-24 15:30:00 UTC
+    </div>
+
+    <div class="feature">
+        <h2>✨ Key Features</h2>
+        <ul>
+            <li><strong>Delta Uploads:</strong> Only uploads changed files</li>
+            <li><strong>Smart Caching:</strong> Automatic CloudFront invalidation</li>
+            <li><strong>Zero Credentials:</strong> Uses OIDC for security</li>
+            <li><strong>Quality Gates:</strong> Lighthouse testing included</li>
+            <li><strong>Fast Deployments:</strong> Complete in <30 seconds</li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h2>🔧 How It Works</h2>
+        <ol>
+            <li>Calculate MD5 hashes of local files</li>
+            <li>Compare with S3 ETags</li>
+            <li>Upload only changed files</li>
+            <li>Invalidate CloudFront cache</li>
+            <li>Run Lighthouse quality checks</li>
+        </ol>
+    </div>
+
+    <div class="feature">
+        <h2>🎯 Performance Metrics</h2>
+        <ul>
+            <li><strong>Deployment Time:</strong> <30 seconds</li>
+            <li><strong>Cost:</strong> <$1/month</li>
+            <li><strong>Lighthouse Score:</strong> ≥90 required</li>
+            <li><strong>Cache Hit Ratio:</strong> >95%</li>
+        </ul>
+    </div>
+
+    <div class="timestamp">
+        <strong>Infrastructure:</strong> AWS S3 + CloudFront + OIDC
+    </div>
 </body>
 </html>
