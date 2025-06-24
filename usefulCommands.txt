@@ -1,8 +1,0 @@
-# Change to primary working directory
-cd C:\Users\Ryan\Desktop\Work\BriteSystems\DevOps\DevOps
-
-# Kill agent and its cache
-gpg-connect-agent killagent /bye
-
-# Or just flush cached PINs
-gpgconf --reload gpg-agent
