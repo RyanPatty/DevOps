@@ -1,0 +1,134 @@
+name: Deploy Static Site
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies and build site
+      run: |
+        # For demo purposes, we'll use the site-sample
+        # In real projects, you'd run: npm ci && npm run build
+        echo "Using site-sample for demo deployment"
+        cp -r site-sample dist/
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: Deploy to AWS
+      run: |
+        deploy_site dist/ \
+          --bucket ${{ secrets.DEPLOY_BUCKET }} \
+          --dist-id ${{ secrets.CF_DIST_ID }} \
+          --wait
+      env:
+        CF_URL: ${{ secrets.CF_URL }}
+        
+    - name: Run Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        urls: |
+          ${{ secrets.CF_URL }}
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+        configPath: './.lighthouseci/lighthouserc.json'
+        
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Read Lighthouse results
+          const resultsPath = path.join(process.env.GITHUB_WORKSPACE, '.lighthouseci', 'manifest.json');
+          let results = [];
+          
+          if (fs.existsSync(resultsPath)) {
+            const manifest = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+            results = manifest.map(item => {
+              const reportPath = path.join(process.env.GITHUB_WORKSPACE, '.lighthouseci', item.lhrPath);
+              if (fs.existsSync(reportPath)) {
+                const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+                return {
+                  url: report.finalUrl,
+                  performance: Math.round(report.categories.performance.score * 100),
+                  accessibility: Math.round(report.categories.accessibility.score * 100),
+                  bestPractices: Math.round(report.categories['best-practices'].score * 100),
+                  seo: Math.round(report.categories.seo.score * 100)
+                };
+              }
+              return null;
+            }).filter(Boolean);
+          }
+          
+          if (results.length > 0) {
+            const result = results[0];
+            const status = (result.performance >= 90 && result.accessibility >= 90) ? '✅' : '❌';
+            
+            const comment = `## 🚀 Deployment Results ${status}
+
+**🌐 Deployed URL:** ${result.url}
+
+### 📊 Lighthouse Scores
+| Metric | Score | Status |
+|--------|-------|--------|
+| Performance | ${result.performance} | ${result.performance >= 90 ? '✅' : '❌'} |
+| Accessibility | ${result.accessibility} | ${result.accessibility >= 90 ? '✅' : '❌'} |
+| Best Practices | ${result.bestPractices} | ${result.bestPractices >= 90 ? '✅' : '❌'} |
+| SEO | ${result.seo} | ${result.seo >= 90 ? '✅' : '❌'} |
+
+**Quality Gate:** ${(result.performance >= 90 && result.accessibility >= 90) ? 'PASSED' : 'FAILED'}
+
+---
+*Deployed by Static-Site Deployer CLI*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+          
+    - name: Deploy Status
+      run: |
+        echo "✅ Deployment completed successfully!"
+        echo "🌐 Site URL: ${{ secrets.CF_URL }}"
+        echo "📊 Lighthouse results available in artifacts" 
