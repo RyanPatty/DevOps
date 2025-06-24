@@ -115,8 +115,7 @@ graph TB
 graph TD
     subgraph "Root Directory"
         A[DevOps/] --> B[static-site-deployer/]
-        A --> C[docs/]
-        A --> D[README.md]
+        A --> C[README.md]
     end
     
     subgraph "CLI Application"
@@ -135,13 +134,6 @@ graph TD
         K --> N[backend.tf<br/>Terraform State]
     end
     
-    subgraph "Documentation"
-        C --> O[howTo.md<br/>Setup Guide]
-        C --> P[PLAN.md<br/>Build Plan]
-        C --> Q[REQUIREMENTS.md<br/>Specifications]
-        C --> R[thingsWeDid.md<br/>Progress]
-    end
-    
     subgraph "Configuration"
         B --> S[pyproject.toml<br/>Python Package]
         B --> T[site-sample/<br/>Test Site]
@@ -152,7 +144,6 @@ graph TD
     style B fill:#f3e5f5
     style E fill:#e8f5e8
     style K fill:#fff3e0
-    style C fill:#f1f8e9
 ```
 
 ### Deployment Flow
@@ -305,9 +296,8 @@ deploy_site <folder> [--bucket BUCKET] [--dist-id DIST_ID]
 ## 📚 Documentation
 
 - **[howTo.md](static-site-deployer/howTo.md)**: Complete setup and usage guide
-- **[REQUIREMENTS.md](REQUIREMENTS.md)**: Detailed specifications
-- **[PLAN.md](PLAN.md)**: Step-by-step build plan
-- **[thingsWeDid.md](thingsWeDid.md)**: Progress tracking
+- **[API Reference](static-site-deployer/cli/)**: CLI module documentation
+- **[Infrastructure](static-site-deployer/infra/)**: Terraform configuration
 
 ## 🤝 Contributing
 
