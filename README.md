@@ -15,7 +15,7 @@ A production-ready CLI tool for deploying static websites to AWS S3 + CloudFront
 
 ```powershell
 # 1. Clone and setup environment
-git clone https://github.com/RyanPatty/DevOps
+git clone https://github.com/yourusername/yourrepo
 cd static-site-deployer
 python -m venv .venv
 .venv\Scripts\Activate.ps1
@@ -295,7 +295,8 @@ deploy_site <folder> [--bucket BUCKET] [--dist-id DIST_ID]
 
 ## 📚 Documentation
 
-- **[howTo.md](static-site-deployer/howTo.md)**: Complete setup and usage guide
+- **[HOWTO.md](static-site-deployer/HOWTO.md)**: Complete step-by-step build and operations guide
+- **[COMMANDS.md](static-site-deployer/COMMANDS.md)**: Quick reference command inventory
 - **[API Reference](static-site-deployer/cli/)**: CLI module documentation
 - **[Infrastructure](static-site-deployer/infra/)**: Terraform configuration
 
