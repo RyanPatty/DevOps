@@ -1,6 +1,6 @@
 # Static-Site Deployer CLI
 
-A production-ready CLI tool for deploying static websites to AWS S3 + CloudFront with intelligent delta uploads, automatic cache invalidation, and zero long-lived credentials.
+A production-ready command-line interface for deploying static websites to AWS S3 + CloudFront with intelligent delta uploads, automatic cache invalidation, and zero long-lived credentials.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20CloudFront-orange.svg)](https://aws.amazon.com/)
@@ -8,27 +8,27 @@ A production-ready CLI tool for deploying static websites to AWS S3 + CloudFront
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-green.svg)](https://github.com/yourusername/yourrepo)
 
-## 🎉 **PROJECT STATUS: COMPLETE & PRODUCTION READY**
+## Project Status: Production Ready
 
-This project has been **successfully completed** and is ready for production use. All features are implemented, tested, and documented.
+This project has been successfully completed and is ready for production deployment. All core features have been implemented, thoroughly tested, and documented.
 
-### **✅ What's Working**
-- ✅ **CLI Tool**: Fully functional with delta uploads and smart caching
-- ✅ **Infrastructure**: AWS S3 + CloudFront deployed with Terraform
+### Implementation Status
+- ✅ **CLI Application**: Fully functional with delta uploads and intelligent caching
+- ✅ **Infrastructure**: AWS S3 + CloudFront deployed via Terraform
 - ✅ **CI/CD Pipeline**: GitHub Actions with OIDC authentication
-- ✅ **Quality Gates**: Lighthouse testing with ≥90 score requirements
-- ✅ **Security**: Zero long-lived credentials via OIDC
-- ✅ **Documentation**: Comprehensive guides and examples
+- ✅ **Quality Assurance**: Lighthouse testing with ≥90 score requirements
+- ✅ **Security Framework**: Zero long-lived credentials via OIDC
+- ✅ **Documentation**: Comprehensive operational guides and examples
 
-### **🚀 Ready to Use**
-- **Deploy your first site**: Follow the Quick Start guide below
-- **CI/CD Integration**: Push to main branch for automatic deployment
-- **Quality Assurance**: Automatic performance and accessibility testing
-- **Production Ready**: <$1/month cost, <30 second deployments
+### Production Readiness
+- **Immediate Deployment**: Follow the Quick Start guide below
+- **Automated CI/CD**: Push to main branch for automatic deployment
+- **Quality Validation**: Automatic performance and accessibility testing
+- **Enterprise Ready**: <$1/month operational cost, <30 second deployments
 
 ---
 
-## 🚀 Quick Start (5 minutes)
+## Quick Start Guide
 
 ### Prerequisites
 - **Python 3.11+** - `python --version`
@@ -36,25 +36,25 @@ This project has been **successfully completed** and is ready for production use
 - **Terraform 1.5+** - `terraform --version`
 - **Node.js 20+** - `node --version` (for Lighthouse testing)
 
-### Installation & First Deployment
+### Initial Setup and Deployment
 
 ```powershell
-# 1. Clone and setup
+# 1. Repository setup
 git clone https://github.com/yourusername/yourrepo
 cd static-site-deployer
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e .
 
-# 2. Deploy infrastructure (one-time setup)
+# 2. Infrastructure deployment (one-time setup)
 cd infra
 terraform apply -var="bucket_name=my-site" -var="github_repo=username/repo"
 
-# 3. Deploy your first site
+# 3. Initial site deployment
 deploy_site site-sample --profile your-aws-profile
 ```
 
-### Basic Usage
+### Basic Operations
 
 ```powershell
 # Deploy with environment variables
@@ -62,70 +62,70 @@ $env:DEPLOY_BUCKET="my-bucket"
 $env:CF_DIST_ID="E123ABC"
 deploy_site dist/ --profile production
 
-# Preview changes (dry run)
+# Preview deployment changes
 deploy_site dist/ --dry-run --profile production
 
-# Deploy and wait for cache invalidation
+# Deploy with cache invalidation wait
 deploy_site dist/ --wait --profile production
 ```
 
-## 🎯 Core Concepts
+## Core Functionality
 
-### What This Tool Does
-- **Deploys static websites** (HTML, CSS, JS, images) to AWS S3
-- **Serves via CloudFront** for global CDN performance
-- **Only uploads changed files** using intelligent delta detection
-- **Automatically invalidates cache** for updated files
-- **Integrates with CI/CD** using secure OIDC authentication
+### Primary Capabilities
+- **Static Site Deployment**: Deploy HTML, CSS, JavaScript, and media assets to AWS S3
+- **Global CDN Distribution**: Serve content via CloudFront for optimal performance
+- **Intelligent Delta Uploads**: Upload only modified files using MD5 hash comparison
+- **Automatic Cache Management**: Invalidate CloudFront cache for updated assets
+- **CI/CD Integration**: Secure deployment automation using OIDC authentication
 
-### Key Benefits
-- **⚡ Fast**: Complete deployments in <30 seconds
-- **🔒 Secure**: Zero long-lived AWS credentials
-- **💰 Cheap**: <$1/month for typical sites
-- **🎯 Smart**: Only uploads what changed
-- **🔄 Reliable**: Automatic rollback via S3 versioning
+### Key Advantages
+- **Performance**: Complete deployments in <30 seconds
+- **Security**: Zero long-lived AWS credentials required
+- **Cost Efficiency**: <$1/month for typical deployments
+- **Intelligence**: Delta-based uploads minimize transfer overhead
+- **Reliability**: Automatic rollback capability via S3 versioning
 
-## ✨ Features
+## Feature Overview
 
-### 🎯 Intelligent Deployments
-- **Delta Uploads**: Only uploads changed files using MD5 hash comparison
-- **Smart Caching**: Automatic CloudFront invalidation for changed files only
-- **Fast Deployments**: Complete deployments in <30 seconds for typical sites
-- **Progress Tracking**: Real-time upload progress with colored output
+### Intelligent Deployment System
+- **Delta Upload Algorithm**: MD5 hash comparison for changed file detection
+- **Smart Cache Invalidation**: Selective CloudFront cache clearing
+- **Rapid Deployment**: <30 second completion for typical sites
+- **Progress Monitoring**: Real-time upload progress with status indicators
 
-### 🔒 Security First
-- **Zero Long-lived Keys**: Uses AWS OIDC for CI/CD authentication
-- **Private S3 Buckets**: Secure storage with Origin Access Control
-- **Least Privilege**: Minimal IAM permissions for deployment operations
-- **Audit Trail**: All operations logged to CloudTrail
+### Security Architecture
+- **OIDC Authentication**: Temporary credentials via GitHub Actions OIDC
+- **Private S3 Storage**: Secure bucket configuration with Origin Access Control
+- **Least Privilege Access**: Minimal IAM permissions for deployment operations
+- **Comprehensive Auditing**: All operations logged to CloudTrail
 
-### 🎯 Quality Assurance
-- **Lighthouse Integration**: Automatic performance and accessibility testing
-- **Quality Gates**: Deployment fails if scores drop below 90
-- **Rollback Ready**: S3 versioning preserves all deployments
-- **Health Checks**: Automatic site validation after deployment
+### Quality Assurance Framework
+- **Lighthouse Integration**: Automated performance and accessibility testing
+- **Quality Gates**: Deployment failure on scores below 90
+- **Version Control**: S3 versioning enables instant rollback capability
+- **Health Validation**: Post-deployment site accessibility verification
 
-### 🛠️ Developer Experience
-- **Simple CLI**: One command deployment
-- **Cross-platform**: Works on Windows, macOS, and Linux
-- **Dry Run Mode**: Preview changes before deployment
-- **Environment Support**: Multiple AWS profiles for staging/production
+### Developer Experience
+- **Streamlined CLI**: Single command deployment interface
+- **Cross-Platform Compatibility**: Windows, macOS, and Linux support
+- **Dry Run Capability**: Preview changes before deployment
+- **Environment Management**: Multiple AWS profile support for staging/production
 
-## 🏗️ Architecture
+## System Architecture
 
-### High-Level System Architecture
+### High-Level Architecture
 
 ```mermaid
 graph TB
-    subgraph "Local Development"
-        A[Static Site Files] --> B[CLI Tool]
-        B --> C[Hash Calculation]
+    subgraph "Local Development Environment"
+        A[Static Site Assets] --> B[CLI Application]
+        B --> C[Hash Calculation Engine]
     end
     
     subgraph "AWS Infrastructure"
         D[S3 Bucket<br/>Private Storage] --> E[CloudFront<br/>Global CDN]
-        F[IAM OIDC Role] --> G[Security Layer]
-        H[CloudTrail<br/>Audit Logs]
+        F[IAM OIDC Role] --> G[Security Framework]
+        H[CloudTrail<br/>Audit Logging]
     end
     
     subgraph "CI/CD Pipeline"
@@ -133,9 +133,9 @@ graph TB
         J --> K[Deploy & Invalidate]
     end
     
-    subgraph "Quality Gates"
-        L[Lighthouse CI] --> M[Performance Check]
-        M --> N[Accessibility Check]
+    subgraph "Quality Assurance"
+        L[Lighthouse CI] --> M[Performance Validation]
+        M --> N[Accessibility Testing]
     end
     
     B --> D
@@ -202,36 +202,36 @@ graph TD
     style D fill:#e0f2f1
 ```
 
-### Deployment Flow
+### Deployment Workflow
 
 ```mermaid
 sequenceDiagram
-    participant CLI as CLI Tool
+    participant CLI as CLI Application
     participant S3 as S3 Bucket
     participant CF as CloudFront
     participant LH as Lighthouse
     
-    CLI->>CLI: Scan local files
+    CLI->>CLI: Scan local file system
     CLI->>CLI: Calculate MD5 hashes
-    CLI->>S3: Get object ETags
+    CLI->>S3: Retrieve object ETags
     CLI->>CLI: Compare hashes vs ETags
     
-    alt Files changed
-        CLI->>S3: Upload changed files
-        CLI->>CF: Create invalidation
-        CF->>CF: Clear cache for paths
-    else No changes
-        CLI->>CLI: Skip upload
+    alt Files modified
+        CLI->>S3: Upload modified files
+        CLI->>CF: Create cache invalidation
+        CF->>CF: Clear cache for specified paths
+    else No modifications
+        CLI->>CLI: Skip upload process
     end
     
-    CLI->>LH: Run performance test
-    LH->>LH: Calculate scores
-    LH->>CLI: Return results
+    CLI->>LH: Execute performance testing
+    LH->>LH: Calculate performance metrics
+    LH->>CLI: Return test results
     
-    alt Scores < 90
-        CLI->>CLI: Exit with error
-    else Scores >= 90
-        CLI->>CLI: Exit with success
+    alt Scores below threshold
+        CLI->>CLI: Exit with error status
+    else Scores meet requirements
+        CLI->>CLI: Exit with success status
     end
 ```
 
@@ -239,17 +239,17 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph "GitHub Actions"
-        A[Workflow Trigger] --> B[OIDC Token Request]
+    subgraph "GitHub Actions Environment"
+        A[Workflow Execution] --> B[OIDC Token Request]
     end
     
-    subgraph "AWS Security"
+    subgraph "AWS Security Framework"
         C[OIDC Provider] --> D[STS Assume Role]
         D --> E[IAM Role]
         E --> F[Least Privilege Policy]
     end
     
-    subgraph "Resources"
+    subgraph "AWS Resources"
         G[S3 Bucket] --> H[CloudFront Distribution]
         I[CloudTrail] --> J[Audit Logs]
     end
@@ -266,72 +266,72 @@ graph LR
     style H fill:#e0f2f1
 ```
 
-## 📋 Essential Commands
+## Command Reference
 
-### Discovery Commands (Find Your Values)
+### Discovery Commands
 ```powershell
-# Get your GitHub username
+# Retrieve GitHub username
 git config user.name
 
-# Get your AWS account ID
+# Obtain AWS account identifier
 aws sts get-caller-identity --profile your-aws-profile --query 'Account' --output text
 
-# List your S3 buckets
+# List S3 buckets
 aws s3 ls --profile your-aws-profile
 
-# List your CloudFront distributions
+# List CloudFront distributions
 aws cloudfront list-distributions --profile your-aws-profile --query 'DistributionList.Items[*].[Id,DomainName]' --output table
 
-# Get Terraform outputs
+# Retrieve Terraform outputs
 cd infra && terraform output
 ```
 
-### Quick Deployment Commands
+### Deployment Commands
 ```powershell
-# Deploy with all parameters
+# Deploy with explicit parameters
 deploy_site dist/ --bucket your-site-bucket --dist-id your-cloudfront-distribution-id --profile your-aws-profile
 
-# Deploy with environment variables
+# Deploy using environment variables
 $env:DEPLOY_BUCKET="your-site-bucket"
 $env:CF_DIST_ID="your-cloudfront-distribution-id"
 deploy_site dist/ --profile your-aws-profile
 
-# Dry run (preview changes)
+# Preview deployment changes
 deploy_site dist/ --dry-run --profile your-aws-profile
 
-# Deploy and wait for invalidation
+# Deploy with cache invalidation wait
 deploy_site dist/ --wait --profile your-aws-profile
 ```
 
-### Infrastructure Commands
+### Infrastructure Management
 ```powershell
-# Initialize Terraform
+# Initialize Terraform workspace
 cd infra
 terraform init
 
-# Plan changes
+# Preview infrastructure changes
 terraform plan -var="bucket_name=your-site-bucket" -var="github_repo=yourusername/yourrepo"
 
-# Apply changes
+# Apply infrastructure changes
 terraform apply -var="bucket_name=your-site-bucket" -var="github_repo=yourusername/yourrepo"
 
-# Get outputs
+# Retrieve infrastructure outputs
 terraform output
 ```
 
 ### Troubleshooting Commands
 ```powershell
-# Fix content-type issues
+# Resolve content-type issues
 aws s3 cp index.html s3://your-site-bucket/index.html --content-type "text/html" --profile your-aws-profile
 
 # Force cache invalidation
 aws cloudfront create-invalidation --distribution-id your-cloudfront-distribution-id --paths "/*" --profile your-aws-profile
 
-# Check distribution status
+# Verify distribution status
 aws cloudfront get-distribution --id your-cloudfront-distribution-id --profile your-aws-profile
 ```
 
-## 📊 Performance Metrics
+## Performance Metrics
 
 ### Deployment Performance
 
@@ -344,7 +344,7 @@ xychart-beta
     line [10, 20, 40]
 ```
 
-### Quality Scores
+### Quality Assessment Scores
 
 ```mermaid
 pie title "Typical Lighthouse Scores"
@@ -356,30 +356,30 @@ pie title "Typical Lighthouse Scores"
 
 | Metric | Target | Typical Result |
 |--------|--------|----------------|
-| **Deployment Time** | <30 seconds | 15-25 seconds |
+| **Deployment Duration** | <30 seconds | 15-25 seconds |
 | **Lighthouse Performance** | ≥90 | 95-100 |
 | **Lighthouse Accessibility** | ≥90 | 95-100 |
-| **Monthly Cost** | <$1 | $0.50-0.80 |
+| **Monthly Operational Cost** | <$1 | $0.50-0.80 |
 | **Cache Hit Ratio** | >95% | 98-99% |
-| **TTFB** | <100ms | 50-80ms |
+| **Time to First Byte** | <100ms | 50-80ms |
 
-## 🎯 Use Cases
+## Use Case Scenarios
 
 ### Static Site Deployment
 ```powershell
-# React/Vue/Angular
+# React/Vue/Angular applications
 npm run build
 deploy_site dist/ --profile production
 
-# Next.js
+# Next.js static export
 npm run export
 deploy_site out/ --profile production
 
-# Hugo/Jekyll
+# Hugo static site generator
 hugo
 deploy_site public/ --profile production
 
-# Gatsby
+# Gatsby static site generator
 gatsby build
 deploy_site public/ --profile production
 ```
@@ -396,48 +396,48 @@ deploy_site public/ --profile production
 
 ### Multi-Environment Deployments
 ```powershell
-# Staging
+# Staging environment
 deploy_site dist/ --bucket staging-site --dist-id E123ABC --profile staging
 
-# Production
+# Production environment
 deploy_site dist/ --bucket prod-site --dist-id E456DEF --profile production
 ```
 
-## 🔧 Configuration
+## Configuration Management
 
 ### Environment Variables
 ```powershell
-# Required for deployment
+# Required deployment parameters
 $env:DEPLOY_BUCKET="your-s3-bucket"
 $env:CF_DIST_ID="your-cloudfront-distribution-id"
 $env:CF_URL="https://your-cloudfront-url.cloudfront.net"
 
-# Optional
+# Optional configuration
 $env:AWS_PROFILE="your-aws-profile"
 $env:LIGHTHOUSE_THRESHOLD="90"
 ```
 
-### CLI Options
+### CLI Parameters
 ```powershell
 deploy_site <folder> [--bucket BUCKET] [--dist-id DIST_ID] 
            [--profile PROFILE] [--dry-run] [--wait] [--no-lighthouse]
 ```
 
-### Exit Codes
-- **0**: Success
-- **1**: Invalid arguments
-- **2**: AWS operation failed
-- **3**: Lighthouse quality gate failed
-- **4**: File system error
-- **5**: Network/connectivity error
+### Exit Code Definitions
+- **0**: Successful execution
+- **1**: Invalid argument parameters
+- **2**: AWS operation failure
+- **3**: Lighthouse quality gate failure
+- **4**: File system operation error
+- **5**: Network connectivity error
 
-## 🏗️ Deep Technical Details
+## Technical Implementation Details
 
 ### AWS Infrastructure Components
 
 #### S3 Bucket Configuration
 ```hcl
-# Private bucket with versioning
+# Private bucket with versioning enabled
 resource "aws_s3_bucket" "static_site" {
   bucket = var.bucket_name
   
@@ -459,7 +459,7 @@ resource "aws_cloudfront_origin_access_control" "static_site" {
 
 #### CloudFront Distribution
 ```hcl
-# Global CDN with caching
+# Global CDN with optimized caching
 resource "aws_cloudfront_distribution" "static_site" {
   origin {
     domain_name              = aws_s3_bucket.static_site.bucket_regional_domain_name
@@ -485,7 +485,7 @@ resource "aws_cloudfront_distribution" "static_site" {
 
 #### IAM OIDC Role
 ```hcl
-# Trust policy for GitHub Actions
+# Trust policy for GitHub Actions OIDC
 resource "aws_iam_role" "github_actions" {
   name = "github-actions-static-site-deployer"
   
@@ -515,10 +515,10 @@ resource "aws_iam_role" "github_actions" {
 ### CLI Architecture
 
 #### Core Components
-1. **main.py**: CLI entry point with argument parsing
-2. **uploader.py**: S3 upload logic with delta detection
-3. **hashutil.py**: MD5 hash calculation utilities
-4. **invalidate.py**: CloudFront cache invalidation
+1. **main.py**: CLI entry point with argument parsing and orchestration
+2. **uploader.py**: S3 upload logic with delta detection and progress tracking
+3. **hashutil.py**: MD5 hash calculation utilities for file comparison
+4. **invalidate.py**: CloudFront cache invalidation with batching
 
 #### Delta Upload Algorithm
 ```python
@@ -603,7 +603,7 @@ def calculate_delta(local_files, s3_objects):
 - **Health checks**: Post-deployment validation
 - **Graceful degradation**: Continue on non-critical failures
 
-## 📚 Documentation
+## Documentation
 
 - **[HOWTO.md](static-site-deployer/HOWTO.md)**: Complete step-by-step build and operations guide
 - **[COMMANDS.md](static-site-deployer/COMMANDS.md)**: Quick reference command inventory with discovery commands
@@ -611,40 +611,40 @@ def calculate_delta(local_files, s3_objects):
 - **[API Reference](static-site-deployer/cli/)**: CLI module documentation
 - **[Infrastructure](static-site-deployer/infra/)**: Terraform configuration details
 
-## 🚨 Troubleshooting
+## Troubleshooting Guide
 
 ### Common Issues
 
-#### Content-Type Problems
+#### Content-Type Resolution
 ```powershell
-# Fix HTML files being downloaded
+# Resolve HTML files being served as downloads
 aws s3 cp index.html s3://your-bucket/index.html --content-type "text/html" --profile your-profile
 
-# Fix CSS files
+# Resolve CSS file content-type
 aws s3 cp style.css s3://your-bucket/style.css --content-type "text/css" --profile your-profile
 
-# Fix JS files
+# Resolve JavaScript file content-type
 aws s3 cp script.js s3://your-bucket/script.js --content-type "application/javascript" --profile your-profile
 ```
 
-#### Cache Issues
+#### Cache Management Issues
 ```powershell
 # Force complete cache invalidation
 aws cloudfront create-invalidation --distribution-id your-dist-id --paths "/*" --profile your-profile
 
-# Check invalidation status
+# Verify invalidation status
 aws cloudfront list-invalidations --distribution-id your-dist-id --profile your-profile
 ```
 
-#### Permission Issues
+#### Permission Verification
 ```powershell
-# Check current identity
+# Verify current identity
 aws sts get-caller-identity --profile your-profile
 
-# Test S3 access
+# Test S3 access permissions
 aws s3 ls s3://your-bucket --profile your-profile
 
-# Test CloudFront access
+# Test CloudFront access permissions
 aws cloudfront list-distributions --profile your-profile
 ```
 
@@ -654,15 +654,15 @@ aws cloudfront list-distributions --profile your-profile
 $env:DEBUG="1"
 deploy_site dist/ --profile your-profile
 
-# Check AWS CLI debug
+# Enable AWS CLI debug output
 aws s3 ls s3://your-bucket --profile your-profile --debug
 ```
 
-## 🤝 Contributing
+## Contributing
 
-### Development Setup
+### Development Environment Setup
 ```powershell
-# Clone and setup development environment
+# Clone repository and setup development environment
 git clone https://github.com/yourusername/yourrepo
 cd static-site-deployer
 python -m venv .venv
@@ -670,20 +670,20 @@ python -m venv .venv
 pip install -e .
 pip install pytest black flake8
 
-# Run tests
+# Execute test suite
 pytest
 
-# Format code
+# Format code according to standards
 black cli/
 
-# Lint code
+# Perform code linting
 flake8 cli/
 ```
 
-### Contribution Guidelines
+### Contribution Process
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
+3. Implement your changes
 4. Add tests if applicable
 5. Ensure all tests pass
 6. Submit a pull request
@@ -694,11 +694,11 @@ flake8 cli/
 - **Documentation**: Clear, concise, and up-to-date
 - **Testing**: Minimum 80% code coverage
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **AWS S3 & CloudFront** for reliable infrastructure
 - **Terraform** for infrastructure as code
@@ -707,6 +707,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Built with ❤️ for the DevOps community**
+**Built for the DevOps community**
 
 *For support, questions, or contributions, please open an issue or pull request.* 
