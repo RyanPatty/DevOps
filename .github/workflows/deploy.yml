@@ -65,7 +65,6 @@ jobs:
           ${{ secrets.CF_URL }}
         uploadArtifacts: true
         temporaryPublicStorage: true
-        configPath: './static-site-deployer/.lighthouseci/lighthouserc.json'
         
     - name: Comment PR with results
       if: github.event_name == 'pull_request'
