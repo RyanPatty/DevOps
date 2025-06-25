@@ -103,7 +103,6 @@ jobs:
       with:
         urls: |
           ${{ secrets.CF_URL }}
-        uploadArtifacts: true
         temporaryPublicStorage: true
         
     - name: Skip Lighthouse - Site not accessible
