@@ -58,6 +58,21 @@ jobs:
       env:
         CF_URL: ${{ secrets.CF_URL }}
         
+    - name: Fix content type for HTML files
+      run: |
+        echo "Fixing content type for HTML files..."
+        aws s3 cp dist/index.html s3://${{ secrets.DEPLOY_BUCKET }}/index.html \
+          --content-type "text/html" \
+          --cache-control "public, max-age=3600"
+        
+        echo "Creating invalidation for content type fix..."
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CF_DIST_ID }} \
+          --paths "/index.html"
+        
+        echo "Waiting for invalidation to complete..."
+        sleep 30
+        
     - name: Wait for CloudFront deployment
       run: |
         echo "Waiting for CloudFront to be fully deployed..."
