@@ -102,22 +102,7 @@ jobs:
             const result = results[0];
             const status = (result.performance >= 90 && result.accessibility >= 90) ? '✅' : '❌';
             
-            const comment = `## 🚀 Deployment Results ${status}
-
-**🌐 Deployed URL:** ${result.url}
-
-### 📊 Lighthouse Scores
-| Metric | Score | Status |
-|--------|-------|--------|
-| Performance | ${result.performance} | ${result.performance >= 90 ? '✅' : '❌'} |
-| Accessibility | ${result.accessibility} | ${result.accessibility >= 90 ? '✅' : '❌'} |
-| Best Practices | ${result.bestPractices} | ${result.bestPractices >= 90 ? '✅' : '❌'} |
-| SEO | ${result.seo} | ${result.seo >= 90 ? '✅' : '❌'} |
-
-**Quality Gate:** ${(result.performance >= 90 && result.accessibility >= 90) ? 'PASSED' : 'FAILED'}
-
----
-*Deployed by Static-Site Deployer CLI*`;
+            const comment = `## 🚀 Deployment Results ${status}\n\n**🌐 Deployed URL:** ${result.url}\n\n### 📊 Lighthouse Scores\n \| Metric \| Score \| Status \|\n \|--------\|-------\|--------\|\n \| Performance \| ${result.performance} \| ${result.performance >= 90 ? '✅' : '❌'} \|\n \| Accessibility \| ${result.accessibility} \| ${result.accessibility >= 90 ? '✅' : '❌'} \|\n \| Best Practices \| ${result.bestPractices} \| ${result.bestPractices >= 90 ? '✅' : '❌'} \|\n \| SEO \| ${result.seo} \| ${result.seo >= 90 ? '✅' : '❌'} \|\n\n**Quality Gate:** ${(result.performance >= 90 && result.accessibility >= 90) ? 'PASSED' : 'FAILED'}\n\n ---\n*Deployed by Static-Site Deployer CLI*`;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
