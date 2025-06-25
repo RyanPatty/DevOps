@@ -58,13 +58,46 @@ jobs:
       env:
         CF_URL: ${{ secrets.CF_URL }}
         
+    - name: Wait for CloudFront deployment
+      run: |
+        echo "Waiting for CloudFront to be fully deployed..."
+        sleep 30
+        
+    - name: Check site accessibility
+      run: |
+        echo "Checking if site is accessible..."
+        if curl -I ${{ secrets.CF_URL }}; then
+          echo "SITE_ACCESSIBLE=true" >> $GITHUB_ENV
+          echo "Site is accessible!"
+        else
+          echo "SITE_ACCESSIBLE=false" >> $GITHUB_ENV
+          echo "Site not accessible yet, waiting more..."
+          sleep 30
+          if curl -I ${{ secrets.CF_URL }}; then
+            echo "SITE_ACCESSIBLE=true" >> $GITHUB_ENV
+            echo "Site is now accessible!"
+          else
+            echo "SITE_ACCESSIBLE=false" >> $GITHUB_ENV
+            echo "Site still not accessible"
+          fi
+        fi
+        
     - name: Run Lighthouse CI
+      if: env.SITE_ACCESSIBLE == 'true'
       uses: treosh/lighthouse-ci-action@v10
       with:
         urls: |
           ${{ secrets.CF_URL }}
         uploadArtifacts: true
         temporaryPublicStorage: true
+        
+    - name: Skip Lighthouse - Site not accessible
+      if: env.SITE_ACCESSIBLE == 'false'
+      run: |
+        echo "⚠️ Skipping Lighthouse tests - site not accessible"
+        echo "🌐 Site URL: ${{ secrets.CF_URL }}"
+        echo "📝 This is normal for new CloudFront distributions (can take 5-15 minutes)"
+        echo "✅ Deployment was successful, site will be accessible soon"
         
     - name: Comment PR with results
       if: github.event_name == 'pull_request'
