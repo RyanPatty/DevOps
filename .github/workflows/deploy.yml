@@ -99,11 +99,14 @@ jobs:
         
     - name: Run Lighthouse CI
       if: env.SITE_ACCESSIBLE == 'true'
+      id: lhci
       uses: treosh/lighthouse-ci-action@v10
       with:
         urls: |
           ${{ secrets.CF_URL }}
         temporaryPublicStorage: true
+        uploadArtifacts: true
+        outputPath: '.lighthouseci'
         
     - name: Skip Lighthouse - Site not accessible
       if: env.SITE_ACCESSIBLE == 'false'
@@ -121,11 +124,18 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           
-          // Read Lighthouse results
+          // Check if Lighthouse results exist
           const resultsPath = path.join(process.env.GITHUB_WORKSPACE, '.lighthouseci', 'manifest.json');
+          
+          if (!fs.existsSync(resultsPath)) {
+            console.log('No Lighthouse results found. Skipping PR comment.');
+            return;
+          }
+          
+          // Read Lighthouse results
           let results = [];
           
-          if (fs.existsSync(resultsPath)) {
+          try {
             const manifest = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
             results = manifest.map(item => {
               const reportPath = path.join(process.env.GITHUB_WORKSPACE, '.lighthouseci', item.lhrPath);
@@ -141,6 +151,9 @@ jobs:
               }
               return null;
             }).filter(Boolean);
+          } catch (error) {
+            console.log('Error reading Lighthouse results:', error.message);
+            return;
           }
           
           if (results.length > 0) {
@@ -155,8 +168,10 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
+          } else {
+            console.log('No valid Lighthouse results found to comment on PR.');
           }
-          
+        
     - name: Deploy Status
       run: |
         echo "✅ Deployment completed successfully!"
