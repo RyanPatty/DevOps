@@ -173,17 +173,43 @@ git push origin main
 
 ### **OIDC Security Model**
 ```mermaid
-graph LR
-    A[GitHub Actions] --> B[OIDC Token]
-    B --> C[AWS STS]
-    C --> D[Temporary Credentials]
-    D --> E[S3/CloudFront]
+flowchart LR
+    subgraph WORKFLOW["🔄 GitHub Workflow"]
+        A["🚀 GitHub Actions<br/><small>Triggered by push/PR</small>"]
+        B["🎫 OIDC Token<br/><small>JWT with claims</small>"]
+        CLAIMS["📋 Token Claims<br/><small>• Repository<br/>• Branch<br/>• Actor</small>"]
+    end
     
-    style A fill:#f1f8e9
-    style B fill:#ffebee
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#e0f2f1
+    subgraph AWS_AUTH["🔐 AWS Authentication"]
+        C["🌐 AWS STS<br/><small>Security Token Service</small>"]
+        D["⏰ Temporary Credentials<br/><small>15min-1hr lifespan</small>"]
+        VALIDATE["✅ Token Validation<br/><small>• Issuer verification<br/>• Audience check<br/>• Expiry validation</small>"]
+    end
+    
+    subgraph RESOURCES["☁️ AWS Resources"]
+        E["🪣 S3 Bucket<br/><small>File uploads</small>"]
+        F["🌐 CloudFront<br/><small>Cache invalidation</small>"]
+        PERMS["🛡️ Limited Permissions<br/><small>• No admin access<br/>• Resource-specific<br/>• Time-bounded</small>"]
+    end
+    
+    %% Flow
+    A --> B
+    B --> CLAIMS
+    B -.->|"🔐 Secure handshake"| C
+    C --> VALIDATE
+    VALIDATE --> D
+    D -.->|"✅ Authorized access"| E
+    D -.->|"✅ Authorized access"| F
+    D --> PERMS
+    
+    %% Styling
+    classDef workflowStyle fill:#f6f8fa,stroke:#0366d6,stroke-width:2px
+    classDef authStyle fill:#fff3e0,stroke:#d73a49,stroke-width:2px
+    classDef resourceStyle fill:#e8f5e8,stroke:#28a745,stroke-width:2px
+    
+    class A,B,CLAIMS workflowStyle
+    class C,D,VALIDATE authStyle
+    class E,F,PERMS resourceStyle
 ```
 
 ### **Least Privilege Access**
@@ -273,4 +299,4 @@ Before pushing to trigger GitHub Actions:
 
 ---
 
-*Last Updated: June 24, 2025* 
+*Last Updated: June 24, 2025*
