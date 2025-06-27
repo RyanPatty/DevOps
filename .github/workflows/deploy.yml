@@ -105,8 +105,6 @@ jobs:
         urls: |
           ${{ secrets.CF_URL }}
         temporaryPublicStorage: true
-        uploadArtifacts: true
-        artifactName: lighthouse-ci-results
         
     - name: Skip Lighthouse - Site not accessible
       if: env.SITE_ACCESSIBLE == 'false'
