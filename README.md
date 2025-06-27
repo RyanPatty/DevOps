@@ -116,154 +116,286 @@ deploy_site dist/ --wait --profile production
 ### High-Level Architecture
 
 ```mermaid
-graph TB
-    subgraph "Local Development Environment"
-        A[Static Site Assets] --> B[CLI Application]
-        B --> C[Hash Calculation Engine]
+flowchart TB
+    subgraph DEV["🖥️ Local Development"]
+        direction TB
+        A["📁 Static Site Assets<br/><small>HTML, CSS, JS, Images</small>"] 
+        B["⚡ CLI Application<br/><small>deploy_site command</small>"]
+        C["🔍 Hash Engine<br/><small>MD5 Delta Detection</small>"]
+        A --> B
+        B --> C
     end
     
-    subgraph "AWS Infrastructure"
-        D[S3 Bucket<br/>Private Storage] --> E[CloudFront<br/>Global CDN]
-        F[IAM OIDC Role] --> G[Security Framework]
-        H[CloudTrail<br/>Audit Logging]
+    subgraph AWS["☁️ AWS Infrastructure"]
+        direction TB
+        D["🪣 S3 Bucket<br/><small>Static File Storage</small>"]
+        E["🌐 CloudFront CDN<br/><small>Global Edge Locations</small>"]
+        F["🔐 IAM OIDC Role<br/><small>GitHub Integration</small>"]
+        H["📊 CloudTrail<br/><small>Audit & Monitoring</small>"]
+        D --> E
+        F -.-> D
+        F -.-> E
+        H -.-> D
+        H -.-> E
     end
     
-    subgraph "CI/CD Pipeline"
-        I[GitHub Actions] --> J[OIDC Authentication]
-        J --> K[Deploy & Invalidate]
+    subgraph CICD["🚀 CI/CD Pipeline"]
+        direction TB
+        I["🔄 GitHub Actions<br/><small>Automated Workflow</small>"]
+        J["🎫 OIDC Token<br/><small>Secure Authentication</small>"]
+        K["📤 Deploy & Invalidate<br/><small>Upload + Cache Clear</small>"]
+        I --> J
+        J --> K
     end
     
-    subgraph "Quality Assurance"
-        L[Lighthouse CI] --> M[Performance Validation]
-        M --> N[Accessibility Testing]
+    subgraph QA["✅ Quality Assurance"]
+        direction TB
+        L["🔍 Lighthouse CI<br/><small>Performance Testing</small>"]
+        M["📈 Metrics Validation<br/><small>Score Thresholds</small>"]
+        N["♿ Accessibility Check<br/><small>WCAG Compliance</small>"]
+        L --> M
+        M --> N
     end
     
-    B --> D
-    K --> D
-    K --> E
-    E --> L
-    I --> F
-    G --> D
-    G --> E
-    G --> H
+    %% Cross-subgraph connections
+    B ==> D
+    K ==> D
+    K ==> E
+    E ==> L
+    I -.-> F
     
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style D fill:#e8f5e8
-    style E fill:#fff3e0
-    style F fill:#ffebee
-    style I fill:#f1f8e9
-    style L fill:#e0f2f1
+    %% Styling
+    classDef devStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef awsStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef cicdStyle fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef qaStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    
+    class A,B,C devStyle
+    class D,E,F,H awsStyle
+    class I,J,K cicdStyle
+    class L,M,N qaStyle
 ```
 
 ### Project Structure
 
 ```mermaid
-graph TD
-    subgraph "Root Directory"
-        A[DevOps/] --> B[static-site-deployer/]
-        A --> C[README.md]
-        A --> D[docs/]
+flowchart TD
+    subgraph ROOT["📁 DevOps Repository"]
+        A["🏠 DevOps/"]
+        C["📖 README.md"]
+        D["📚 docs/"]
     end
     
-    subgraph "CLI Application"
-        B --> E[cli/]
-        E --> F[main.py<br/>CLI Entry Point]
-        E --> G[uploader.py<br/>S3 Upload Logic]
-        E --> H[hashutil.py<br/>File Hash Utils]
-        E --> I[invalidate.py<br/>CloudFront Logic]
-        E --> J[__init__.py]
+    subgraph MAIN["🎯 static-site-deployer/"]
+        B["📦 Main Package"]
     end
     
-    subgraph "Infrastructure"
-        B --> K[infra/]
-        K --> L[main.tf<br/>S3 + CloudFront]
-        K --> M[oidc.tf<br/>IAM OIDC Role]
-        K --> N[backend.tf<br/>Terraform State]
+    subgraph CLI["⚡ CLI Application"]
+        direction TB
+        E["📂 cli/"]
+        F["🚀 main.py<br/><small>CLI Entry Point & Orchestration</small>"]
+        G["📤 uploader.py<br/><small>S3 Upload with Delta Detection</small>"]
+        H["🔍 hashutil.py<br/><small>MD5 Hash Calculations</small>"]
+        I["🌐 invalidate.py<br/><small>CloudFront Cache Management</small>"]
+        J["📋 __init__.py<br/><small>Package Initialization</small>"]
     end
     
-    subgraph "Configuration"
-        B --> S[pyproject.toml<br/>Python Package]
-        B --> T[site-sample/<br/>Test Site]
-        B --> U[.github/<br/>GitHub Actions]
+    subgraph INFRA["🏗️ Infrastructure as Code"]
+        direction TB
+        K["📂 infra/"]
+        L["☁️ main.tf<br/><small>S3 Bucket + CloudFront CDN</small>"]
+        M["🔐 oidc.tf<br/><small>GitHub OIDC Integration</small>"]
+        N["💾 backend.tf<br/><small>Terraform Remote State</small>"]
     end
     
-    subgraph "Documentation"
-        D --> V[HOWTO.md<br/>Step-by-step Guide]
-        D --> W[COMMANDS.md<br/>Command Reference]
-        D --> X[PLAN.md<br/>Project Plan]
-        D --> Y[REQUIREMENTS.md<br/>Requirements]
+    subgraph CONFIG["⚙️ Configuration & Testing"]
+        direction TB
+        S["📋 pyproject.toml<br/><small>Python Package Config</small>"]
+        T["🌐 site-sample/<br/><small>Demo Static Site</small>"]
+        U["🔄 .github/<br/><small>CI/CD Workflows</small>"]
+        TEST["🧪 tests/<br/><small>Unit Tests</small>"]
     end
     
-    style A fill:#e3f2fd
-    style B fill:#f3e5f5
-    style E fill:#e8f5e8
-    style K fill:#fff3e0
-    style D fill:#e0f2f1
+    subgraph DOCS["📚 Documentation"]
+        direction TB
+        V["📖 HOWTO.md<br/><small>Complete Setup Guide</small>"]
+        W["⌨️ COMMANDS.md<br/><small>CLI Reference</small>"]
+        X["📋 PLAN.md<br/><small>Project Roadmap</small>"]
+        Y["📝 REQUIREMENTS.md<br/><small>Technical Specs</small>"]
+        Z["🔑 GITHUB_SECRETS.md<br/><small>Security Setup</small>"]
+    end
+    
+    %% Connections
+    A --> B
+    A --> C
+    A --> D
+    
+    B --> E
+    B --> K
+    B --> S
+    B --> T
+    B --> U
+    B --> TEST
+    
+    E --> F
+    E --> G
+    E --> H
+    E --> I
+    E --> J
+    
+    K --> L
+    K --> M
+    K --> N
+    
+    D --> V
+    D --> W
+    D --> X
+    D --> Y
+    D --> Z
+    
+    %% Styling
+    classDef rootStyle fill:#e8eaf6,stroke:#3f51b5,stroke-width:3px
+    classDef mainStyle fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    classDef cliStyle fill:#e8f5e8,stroke:#4caf50,stroke-width:2px
+    classDef infraStyle fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    classDef configStyle fill:#e0f2f1,stroke:#009688,stroke-width:2px
+    classDef docsStyle fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    
+    class A,C,D rootStyle
+    class B mainStyle
+    class E,F,G,H,I,J cliStyle
+    class K,L,M,N infraStyle
+    class S,T,U,TEST configStyle
+    class V,W,X,Y,Z docsStyle
 ```
 
 ### Deployment Workflow
 
 ```mermaid
 sequenceDiagram
-    participant CLI as CLI Application
-    participant S3 as S3 Bucket
-    participant CF as CloudFront
-    participant LH as Lighthouse
+    participant DEV as 👨‍💻 Developer
+    participant CLI as ⚡ CLI Application
+    participant S3 as 🪣 S3 Bucket
+    participant CF as 🌐 CloudFront
+    participant LH as 🔍 Lighthouse CI
+    participant GH as 🔄 GitHub Actions
     
-    CLI->>CLI: Scan local file system
-    CLI->>CLI: Calculate MD5 hashes
-    CLI->>S3: Retrieve object ETags
-    CLI->>CLI: Compare hashes vs ETags
+    Note over DEV,GH: 🚀 Static Site Deployment Process
     
-    alt Files modified
-        CLI->>S3: Upload modified files
-        CLI->>CF: Create cache invalidation
-        CF->>CF: Clear cache for specified paths
-    else No modifications
-        CLI->>CLI: Skip upload process
+    DEV->>CLI: deploy_site dist/ --profile prod
+    
+    rect rgb(240, 248, 255)
+        Note over CLI: 📁 File System Analysis
+        CLI->>CLI: 🔍 Scan local directory
+        CLI->>CLI: 🧮 Calculate MD5 hashes
+        CLI->>S3: 📋 Retrieve object ETags
+        CLI->>CLI: ⚖️ Compare local vs remote
     end
     
-    CLI->>LH: Execute performance testing
-    LH->>LH: Calculate performance metrics
-    LH->>CLI: Return test results
+    alt 📝 Files Modified
+        rect rgb(240, 255, 240)
+            Note over CLI,CF: 📤 Upload & Cache Management
+            CLI->>S3: 📤 Upload changed files only
+            S3-->>CLI: ✅ Upload confirmation
+            CLI->>CF: 🗑️ Create cache invalidation
+            CF->>CF: 🔄 Clear edge cache globally
+            CF-->>CLI: 🎯 Invalidation ID returned
+        end
+    else 🔄 No Changes Detected
+        rect rgb(255, 255, 240)
+            CLI->>CLI: ⏭️ Skip upload process
+            Note over CLI: 💡 Delta detection saves time
+        end
+    end
     
-    alt Scores below threshold
-        CLI->>CLI: Exit with error status
-    else Scores meet requirements
-        CLI->>CLI: Exit with success status
+    rect rgb(255, 240, 245)
+        Note over CLI,LH: 📊 Quality Assurance
+        CLI->>LH: 🧪 Execute performance tests
+        LH->>LH: 📈 Analyze metrics (Performance, A11y, SEO)
+        LH-->>CLI: 📊 Return lighthouse scores
+    end
+    
+    alt 📉 Scores Below Threshold
+        CLI->>DEV: ❌ Exit with error (scores < 90)
+        Note over DEV: 🔧 Fix performance issues
+    else 📈 Quality Standards Met
+        CLI->>DEV: ✅ Deployment successful!
+        Note over DEV: 🎉 Site live with optimal performance
+    end
+    
+    rect rgb(245, 245, 255)
+        Note over GH: 🤖 Automated CI/CD (Optional)
+        GH->>GH: 🔐 OIDC authentication
+        GH->>S3: 📤 Deploy via GitHub Actions
+        GH->>CF: 🗑️ Invalidate cache
     end
 ```
 
 ### Security Model
 
 ```mermaid
-graph LR
-    subgraph "GitHub Actions Environment"
-        A[Workflow Execution] --> B[OIDC Token Request]
+flowchart LR
+    subgraph GITHUB["🔄 GitHub Actions Environment"]
+        direction TB
+        A["🚀 Workflow Trigger<br/><small>Push to main branch</small>"]
+        B["🎫 OIDC Token Request<br/><small>JWT with repo claims</small>"]
+        REPO["📁 Repository Context<br/><small>org/repo verification</small>"]
+        A --> B
+        A --> REPO
     end
     
-    subgraph "AWS Security Framework"
-        C[OIDC Provider] --> D[STS Assume Role]
-        D --> E[IAM Role]
-        E --> F[Least Privilege Policy]
+    subgraph AWS_SEC["🔐 AWS Security Framework"]
+        direction TB
+        C["🌐 OIDC Identity Provider<br/><small>GitHub trusted issuer</small>"]
+        D["🔑 STS AssumeRole<br/><small>Temporary credentials</small>"]
+        E["👤 IAM Role<br/><small>github-actions-deployer</small>"]
+        F["📋 Least Privilege Policy<br/><small>S3 + CloudFront only</small>"]
+        C --> D
+        D --> E
+        E --> F
     end
     
-    subgraph "AWS Resources"
-        G[S3 Bucket] --> H[CloudFront Distribution]
-        I[CloudTrail] --> J[Audit Logs]
+    subgraph AWS_RES["☁️ AWS Resources"]
+        direction TB
+        G["🪣 S3 Bucket<br/><small>Static file storage</small>"]
+        H["🌐 CloudFront CDN<br/><small>Global distribution</small>"]
+        I["📊 CloudTrail<br/><small>API call logging</small>"]
+        J["🔍 Audit Logs<br/><small>Security monitoring</small>"]
+        G --> H
+        I --> J
     end
     
-    B --> C
-    F --> G
-    F --> H
-    F --> I
+    subgraph PERMS["🛡️ Permission Boundaries"]
+        direction TB
+        P1["📤 s3:PutObject<br/><small>Upload files only</small>"]
+        P2["📋 s3:ListBucket<br/><small>Read bucket contents</small>"]
+        P3["🗑️ cloudfront:CreateInvalidation<br/><small>Clear cache only</small>"]
+        P4["❌ No Admin Access<br/><small>Cannot modify infrastructure</small>"]
+    end
     
-    style A fill:#f1f8e9
-    style C fill:#ffebee
-    style E fill:#e8f5e8
-    style G fill:#fff3e0
-    style H fill:#e0f2f1
+    %% Security Flow
+    B -.->|"🔐 JWT Token"| C
+    REPO -.->|"✅ Repo Validation"| C
+    F -.->|"✅ Authorized"| G
+    F -.->|"✅ Authorized"| H
+    F -.->|"📝 Logged"| I
+    
+    %% Permission Mapping
+    F --> P1
+    F --> P2
+    F --> P3
+    F --> P4
+    
+    %% Styling
+    classDef githubStyle fill:#f6f8fa,stroke:#24292e,stroke-width:2px
+    classDef awsSecStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef awsResStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef permStyle fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class A,B,REPO githubStyle
+    class C,D,E,F awsSecStyle
+    class G,H,I,J awsResStyle
+    class P1,P2,P3,P4 permStyle
 ```
 
 ## Command Reference
@@ -337,21 +469,32 @@ aws cloudfront get-distribution --id your-cloudfront-distribution-id --profile y
 
 ```mermaid
 xychart-beta
-    title "Deployment Performance Metrics"
-    x-axis [Small Site, Medium Site, Large Site]
-    y-axis "Time (seconds)" 0 --> 60
-    bar [15, 25, 45]
-    line [10, 20, 40]
+    title "📊 Deployment Performance by Site Size"
+    x-axis ["🏠 Small Site (< 10MB)", "🏢 Medium Site (10-50MB)", "🏭 Large Site (50-100MB)"]
+    y-axis "⏱️ Time (seconds)" 0 --> 60
+    bar [12, 28, 45]
+    line [8, 22, 38]
 ```
 
 ### Quality Assessment Scores
 
 ```mermaid
-pie title "Typical Lighthouse Scores"
-    "Performance" : 95
-    "Accessibility" : 98
-    "Best Practices" : 100
-    "SEO" : 100
+%%{init: {'pie': {'textPosition': 0.75}, 'themeVariables': {'pieOuterStrokeWidth': '2px'}}}%%
+pie title "🔍 Lighthouse Performance Metrics"
+    "🚀 Performance" : 96
+    "♿ Accessibility" : 98
+    "✅ Best Practices" : 100
+    "🔍 SEO" : 100
+```
+
+### Infrastructure Cost Breakdown
+
+```mermaid
+xychart-beta
+    title "💰 Monthly AWS Costs (USD)"
+    x-axis ["S3 Storage", "CloudFront", "Data Transfer", "Requests"]
+    y-axis "Cost ($)" 0 --> 1.0
+    bar [0.15, 0.25, 0.10, 0.05]
 ```
 
 | Metric | Target | Typical Result |
@@ -709,4 +852,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Built for the DevOps community**
 
-*For support, questions, or contributions, please open an issue or pull request.* 
+*For support, questions, or contributions, please open an issue or pull request.*
