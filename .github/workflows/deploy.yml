@@ -106,28 +106,6 @@ jobs:
           ${{ secrets.CF_URL }}
         temporaryPublicStorage: true
         
-    - name: Debug Lighthouse Results
-      if: env.SITE_ACCESSIBLE == 'true'
-      run: |
-        echo "🔍 Checking Lighthouse results..."
-        echo "Current directory: $(pwd)"
-        echo "Files in workspace:"
-        ls -la
-        echo ""
-        echo "Checking for .lighthouseci folder:"
-        if [ -d ".lighthouseci" ]; then
-          echo "✅ .lighthouseci folder exists"
-          ls -la .lighthouseci/
-          if [ -f ".lighthouseci/manifest.json" ]; then
-            echo "✅ manifest.json exists"
-            cat .lighthouseci/manifest.json
-          else
-            echo "❌ manifest.json not found"
-          fi
-        else
-          echo "❌ .lighthouseci folder not found"
-        fi
-        
     - name: Skip Lighthouse - Site not accessible
       if: env.SITE_ACCESSIBLE == 'false'
       run: |
